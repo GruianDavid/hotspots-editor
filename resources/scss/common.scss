@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato&family=Raleway:wght@400;500;600;700;900&display=swap');
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+body {
+    position: relative;
+    height: 100vh;
+}
+
+$brand-dark: #0e0727;
+$brand-dark-medium: #221c3a;
+$brand-light: #a59fb8;
+$brand-accent: #42B98B;
+$animation: cubic-bezier(.71, -0.26, .29, 1.27);
+
+$brand-title: 'Raleway',
+sans-serif;
+$brand-text: 'Lato',
+sans-serif;
+//Buttons
+.checkbox,
+.radio {
+    position: relative;
+    min-height: 50px;
+    display: flex;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        left: 0;
+        width: 24px;
+        height: 24px;
+        display: block;
+        padding: 0;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    label {
+        display: block;
+        padding-left: 40px;
+        line-height: 24px;
+        user-select: none;
+        cursor: pointer;
+        font-family: $brand-text;
+        font-weight: 600;
+        letter-spacing: 1px;
+        font-size: 16px;
+
+        &:before {
+            content: "✓";
+            display: flex;
+            width: 24px;
+            height: 24px;
+            line-height: 0;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            position: absolute;
+            left: 2px;
+            background: $brand-dark-medium;
+            box-shadow: 0px 0px 0px 2px $brand-light;
+            transition: all 0.15s $animation;
+            color: $brand-accent;
+            font-size: 0;
+        }
+
+        &:after {
+            content: "";
+            display: flex;
+            width: 24px;
+            height: 24px;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            position: absolute;
+            left: 2px;
+            top: 0;
+            background: $brand-light;
+            opacity: 0;
+        }
+
+        &:before,
+        &:after {
+            cursor: pointer;
+        }
+    }
+
+    input:checked+label {
+        color: $brand-accent;
+    }
+
+    input:checked+label:before,
+    label.checked:before {
+        font-size: 12px;
+        box-shadow: 0px 0px 0px 4px $brand-accent;
+    }
+
+    input:checked+label:after,
+    label.checked:after {
+        animation: pulse 0.35s linear;
+    }
+}
+
+
+.radio {
+
+    label {
+
+        &:before,
+        &:after {
+            border-radius: 24px;
+        }
+
+        &:before {
+            content: "";
+        }
+    }
+
+    input:checked+label:before,
+    label.checked:before {
+        box-shadow: 0px 0px 0px 4px $brand-accent,
+        inset 0px 0px 0px 6px $brand-dark-medium,
+        inset 0px 0px 0px 20px $brand-accent;
+        font-size: 22px;
+    }
+}
+
+.form-content::-webkit-scrollbar {
+    display: none;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0;
+    }
+
+    40% {
+        transform: scale(1.4);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}

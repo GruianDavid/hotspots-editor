@@ -1,0 +1,387 @@
+@use "sass:math";
+$brand-dark: #0e0727;
+$brand-dark-medium: #221c3a;
+$brand-light: #a59fb8;
+$brand-accent: #42B98B;
+
+$brand-title: 'Raleway',
+sans-serif;
+$brand-text: 'Lato',
+sans-serif;
+
+$sidebar-width: 400px;
+$animation: cubic-bezier(.71, -0.26, .29, 1.27);
+$sidebar-padding: 30px;
+
+$toggler-width: 44px;
+$toggler-right-offset: $toggler-width - 2;
+$toggler-height: 400px;
+$toggler-dot-size: 8px;
+$dot-offset: $toggler-dot-size * 1.5;
+
+#sidebar {
+    background: $brand-dark;
+    width: 5px;
+    height: 100vh;
+    position: fixed;
+    z-index: 999;
+    transition: width 0.25s $animation;
+    box-shadow: 5px 0px 25px 0px rgba(0, 0, 0, 0.3);
+    top: 0;
+    &.opened {
+        width: $sidebar-width;
+    }
+}
+
+.sidebar-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow: hidden;
+
+
+    &-inner {
+        min-width: $sidebar-width;
+        height: 100%;
+    }
+}
+
+#form {
+    color: $brand-light;
+    height: 100%;
+
+    .form {
+        display: flex;
+
+        &-content {
+            flex-direction: column;
+            height: calc(100% - 100px);
+            overflow-y: auto;
+            width: calc(#{$sidebar-width} + 20px);
+            padding: $sidebar-padding calc(#{$sidebar-padding} + 20px) $sidebar-padding $sidebar-padding;
+        }
+
+        &-category {
+
+            padding-bottom: 30px;
+            margin-bottom: 60px;
+
+            &-title {
+                color: $brand-light;
+                font-size: 18px;
+                font-family: $brand-title;
+                font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                margin-bottom: 30px;
+            }
+
+            &-content {
+                display: flex;
+                justify-content: space-between;
+                button {
+                    &#markerDelete{
+
+                        background: #DB4848;
+                        border: 3px solid #DB4848;
+
+                    }
+                    &#markerConfirm{
+
+                        background: $brand-accent;
+                        border: 3px solid $brand-accent;
+
+                    }
+                    padding: 18px 30px;
+                    border-radius: 12px;
+                    color: $brand-dark;
+                    font-family: $brand-title;
+                    text-transform: uppercase;
+                    letter-spacing: 3px;
+                    font-weight: 900;
+                    font-size: 18px;
+                    cursor: pointer;
+                    box-shadow: 0px 0px 0px 0px rgba($brand-accent, 0);
+                    transition: all 0.5s $animation;
+
+                    &:hover {
+                        &#markerDelete{
+                            box-shadow: 0px 0px 0px 6px rgba(#DB4848, 0.3);
+                        }
+                        &#markerConfirm{
+                            box-shadow: 0px 0px 0px 6px rgba($brand-accent, 0.3);
+                        }
+                    }
+                }
+            }
+        }
+
+        &-action {
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: $sidebar-padding;
+
+            .reset-filters {
+                width: 100%;
+                background: $brand-light;
+                border: 3px solid $brand-light;
+                padding: 18px 30px;
+                border-radius: 12px;
+                color: $brand-dark;
+                font-family: $brand-title;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                font-weight: 900;
+                font-size: 18px;
+                cursor: pointer;
+                box-shadow: 0px 0px 0px 0px rgba($brand-light, 0);
+                transition: all 0.5s $animation;
+
+                &:hover {
+                    box-shadow: 0px 0px 0px 6px rgba($brand-light, 0.3);
+                }
+            }
+        }
+    }
+}
+
+
+#sidebar-toggler {
+    position: absolute;
+    top: 50%;
+    z-index: 999999;
+    transform: translateY(-50%);
+    right: -$toggler-right-offset;
+    margin-left: -10px;
+    width: $toggler-width;
+    height: $toggler-height;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    user-select: none;
+
+
+    svg {
+        display: block;
+        width: $toggler-width;
+        height: $toggler-height;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        position: absolute;
+        overflow: visible;
+
+        path {
+            fill: $brand-dark;
+            filter: drop-shadow(5px 0px 25px rgba(0, 0, 0, 0.3));
+        }
+    }
+
+    .toggler-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 8px;
+        background: #fff;
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.25s $animation;
+
+        &.top {
+            top: calc(50% - #{$dot-offset});
+        }
+
+        &.bottom {
+            top: calc(50% + #{$dot-offset});
+        }
+
+    }
+
+    &.opened {
+        .toggler-dot.middle {
+            height: math.div($toggler-dot-size, 2);
+            width: math.div($toggler-dot-size, 2);
+        }
+
+        .toggler-dot.top,
+        .toggler-dot.bottom {
+            top: 50%;
+        }
+
+        .toggler-dot.top {
+            animation: toggler-top-dot-to-close 0.25s forwards;
+            animation-delay: 0.25s;
+        }
+
+        .toggler-dot.bottom {
+            animation: toggler-bottom-dot-to-close 0.25s forwards;
+            animation-delay: 0.25s;
+        }
+
+    }
+}
+
+@keyframes toggler-top-dot-to-close {
+
+    to {
+        transform: translate(-50%, -50%) rotate(135deg);
+        height: $toggler-dot-size * 3;
+        width: math.div($toggler-dot-size, 2);
+    }
+}
+
+@keyframes toggler-bottom-dot-to-close {
+
+    to {
+        transform: translate(-50%, -50%) rotate(-135deg);
+        height: $toggler-dot-size * 3;
+        width: math.div($toggler-dot-size , 2);
+    }
+}
+.leaflet-container .leaflet-control-attribution{
+    background-color: rgba(0,0,0,0.3);
+    color: #dddddd;
+    a{
+        text-decoration: none;
+        color: #dddddd;
+    }
+}
+.leaflet-control-zoom.leaflet-control {
+    margin-right: 16px;
+    margin-bottom: 16px;
+    border: none;
+    box-shadow: 3px 5px 15px 0px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: hidden;
+    a[role="button"] {
+        background: $brand-dark;
+        color: $brand-light;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        font-size: 32px;
+        font-family: $brand-title;
+        border: none;
+        transition: all 0.25s ease-in-out;
+        &:not(:last-child) {
+            border-bottom: 1px solid $brand-dark-medium;
+        }
+        &:hover {
+            background: $brand-dark-medium;
+        }
+    }
+}
+.leaflet-control-layers-toggle {
+    display: none;
+}
+.leaflet-control-layers.leaflet-control {
+    background: $brand-dark;
+    border: none;
+    margin: 16px;
+    font-family: $brand-title;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 10px;
+    box-shadow: 3px 5px 15px 0px rgba(0, 0, 0, 0.5);
+    width: 40px;
+    overflow: hidden;
+    &.leaflet-control-layers-expanded {
+        padding: 0;
+    }
+    .leaflet-control-layers-list {
+        display: flex;
+        flex-direction: column;
+    }
+    .leaflet-control-layers-base {
+        color: $brand-light;
+        &:before {
+            content: "Map";
+            font-family: $brand-title;
+            display: block;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 8px 0;
+            width: 100%;
+        }
+        label {
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+            &:hover {
+                background: $brand-dark-medium;
+            }
+            span {
+                position: relative;
+                width: 40px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 6px;
+                input {
+                    position: absolute;
+                    top:0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0;
+                    z-index: 1;
+                    cursor: pointer;
+                }
+                input:checked + span:before {
+                    color: $brand-accent;
+                }
+                input:checked + span:after {
+                    box-shadow: 0px 0px 0px 2px rgba($brand-accent, 1),
+                    inset 0px 0px 0px 1px rgba($brand-dark-medium, 1) ;
+                }
+                span {
+                    font-family: $brand-text;
+                    font-size: 0px;
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column-reverse;
+                    &:before {
+                        font-size: 8px;
+                        text-align: center;
+                        font-weight: 700;
+                        letter-spacing: 0.2px;
+                        font-family: $brand-text;
+                    }
+                    &:after {
+                        content: "";
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 24px;
+                        display: block;
+                        margin: 0 auto 4px;
+                        background: $brand-light;
+                        box-shadow: 0px 0px 0px 2px rgba($brand-light, 0.3);
+                    }
+                }
+            }
+        }
+        label:nth-child(1) span {
+            span:after{background: $brand-light;}
+            span:before {content: "OSM"}
+        }
+        label:nth-child(2) span {
+            span:after{background: #212121;}
+            span:before {content: "Dark"}
+        }
+        label:nth-child(3) span {
+            span:after{background: #fefefe;}
+            span:before {content: "Light"}
+        }
+    }
+}

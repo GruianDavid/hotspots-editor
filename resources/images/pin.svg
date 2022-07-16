@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34" height="48" viewBox="0 0 34 48">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.183" y1="0.087" x2="0.5" y2="0.995" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#1cb189"/>
+      <stop offset="1" stop-color="#2d93de"/>
+    </linearGradient>
+    <filter id="Ellipse_8" x="1.821" y="1.755" width="30.769" height="30.769" filterUnits="userSpaceOnUse">
+      <feOffset input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feFlood flood-opacity="0.169"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-pin">
+      <rect width="34" height="48"/>
+    </clipPath>
+  </defs>
+  <g id="pin" clip-path="url(#clip-pin)">
+    <g id="Group_6" data-name="Group 6" transform="translate(-3.121 -15.851)">
+      <path id="Union_4" data-name="Union 4" d="M17.006,34.234H17C17,37.084,17,41.416,17,48c-.728-6.215-4.231-11.547-9.752-16.86A17.142,17.142,0,0,1,17,0a17.142,17.142,0,0,1,9.753,31.139C21.233,36.452,17.73,41.784,17,48,17,41.416,17.006,37.084,17.006,34.234Z" transform="translate(3.121 15.851)" fill="url(#linear-gradient)"/>
+      <g transform="matrix(1, 0, 0, 1, 3.12, 15.85)" filter="url(#Ellipse_8)">
+        <circle id="Ellipse_8-2" data-name="Ellipse 8" cx="9.384" cy="9.384" r="9.384" transform="translate(7.82 7.76)" fill="#fff"/>
+      </g>
+    </g>
+    <rect id="Rectangle_14" data-name="Rectangle 14" width="39" height="64" fill="none"/>
+  </g>
+</svg>
