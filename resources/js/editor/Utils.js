@@ -1,4 +1,6 @@
 import pin from '@/../images/pin.svg'
+import {Events} from "./Events";
+import {Util} from "leaflet/dist/leaflet-src.esm";
 
 export class Utils {
     static pin = pin
@@ -60,6 +62,132 @@ export class Utils {
                 console.log(e)
             }
         })
+    }
+
+    static getHotspots(map,polygon) {
+        const async = true;
+        const bbox = JSON.stringify(polygon.toGeoJSON().geometry);
+        const url = "/heatpoints?bbox="+bbox
+        let httpRequest = new XMLHttpRequest()
+        httpRequest.open("GET", url, async);
+        httpRequest.send();
+        Utils.toggleLoader(true);
+        httpRequest.onreadystatechange = (e) => {
+            if (httpRequest.readyState === 4 && httpRequest.status === 200) {
+                JSON.parse(httpRequest.response).forEach(response => {
+                    let marker = new L.marker(JSON.parse(response.coordinates), {
+                        draggable:'true',
+                        icon: Utils.createSimpleIcon()
+                    })
+                    let layerGroup = new L.layerGroup()
+                    marker.data={id:response.id}
+                    layerGroup.addLayer(marker);
+                    map.addLayer(layerGroup);
+                    Events.setMarkerEvents(marker, layerGroup);
+                })
+                Utils.toggleLoader(false);
+            }
+        }
+    }
+
+    static getWays(map,polygon) {
+        const async = true;
+        const bbox = JSON.stringify(polygon.toGeoJSON().geometry);
+        const url = "/ways?bbox="+bbox
+        let httpRequest = new XMLHttpRequest()
+        httpRequest.open("GET", url, async);
+        httpRequest.send();
+        Utils.toggleLoader(true);
+        httpRequest.onreadystatechange = (e) => {
+            if (httpRequest.readyState === 4 && httpRequest.status === 200) {
+                JSON.parse(httpRequest.response).forEach(way => {
+                    let wayCoordinates = JSON.parse(way.coordinates);
+                    L.polyline(wayCoordinates, {color: "#42B98B", weight: 3 , opacity: 1}).addTo(map);
+                })
+                Utils.toggleLoader(false);
+            }
+        }
+    }
+
+    //Get geojson geometry from bbox
+    static getPolygonFromBounds(bounds){
+        let outerBoundsLatLngs = [
+            bounds.getSouthWest(),
+            bounds.getNorthWest(),
+            bounds.getNorthEast(),
+            bounds.getSouthEast()
+        ];
+        return new L.Polygon(outerBoundsLatLngs)
+    }
+
+    static displayMarkerData(newMarker, oldMarker = newMarker){
+        const oldMarkerCoords = oldMarker.getLatLng();
+        document.getElementById('oldCoordinates').innerText = oldMarkerCoords.lat + ", " + oldMarkerCoords.lng;
+        const newMarkerCoords = newMarker.getLatLng();
+        document.getElementById('newCoordinates').innerText = newMarkerCoords.lat + ", " + newMarkerCoords.lng;
+    }
+
+    static async updateMarker(marker){
+        const url = '/heatpoints/update/'+marker.data.id;
+        const data = {coords: marker.getLatLng()}
+        Utils.toggleLoader(true)
+        await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json, text-plain, */*",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+            },
+            method: 'post',
+            credentials: "same-origin",
+            body: JSON.stringify(data)
+        })
+    }
+
+    static async deleteMarker(marker){
+        const url = '/heatpoints/delete/'+marker.data.id;
+        Utils.toggleLoader(true)
+        await fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json, text-plain, */*",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+            },
+            method: 'post',
+            credentials: "same-origin"
+        })
+    }
+
+    static storeMarker(map, marker){
+        const url = '/heatpoints';
+        const data = {coords: marker.getLatLng()}
+        Utils.toggleLoader(true)
+        fetch(url, {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json, text-plain, */*",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+            },
+            method: 'post',
+            credentials: "same-origin",
+            body: JSON.stringify(data)
+        }).then((response) => {
+            Utils.toggleLoader(false)
+            if (response.ok){
+                marker.data = {id:response.id}
+            }else{
+                map.removeLayer(marker)
+                Events.sidebarToggle(false)
+            }
+        })
+    }
+
+    //Display or hide loader
+    static toggleLoader(status){
+        let loader = document.getElementById('loader');
+        status ? loader.classList.add('visible') : loader.classList.remove('visible');
     }
 
 }

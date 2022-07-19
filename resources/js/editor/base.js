@@ -9,7 +9,9 @@ import {Events} from "./Events";
 
 
 let map = Utils.initializeMapWithBaseStyles()
-
+Utils.getHotspots(map,Utils.getPolygonFromBounds(map.getBounds()))
 Events.mapEvents(map)
-Events.sidebarEvents(map)
-
+// todo enable on lower zoom levels
+// Utils.getWays(map,Utils.getPolygonFromBounds(map.getBounds()))
+Events.sidebarEvents()
+document.querySelector('body').style.visibility='visible'

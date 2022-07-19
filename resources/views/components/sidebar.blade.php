@@ -7,7 +7,7 @@
                         <div class="form-category-title">
                             Initial Coordinates
                         </div>
-                        <div class="form-category-content">
+                        <div id="oldCoordinates" class="form-category-content">
                             23.34324423234, 45.234234234
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="form-category-title">
                             New Coordinates
                         </div>
-                        <div class="form-category-content">
+                        <div id="newCoordinates" class="form-category-content">
                             23.34324423234, 45.234234234
                         </div>
                     </div>

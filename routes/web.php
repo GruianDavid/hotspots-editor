@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('editor');
 });
+//Api routes
+Route::post('/heatpoints', [\App\Http\Controllers\MapController::class,'createCoordinate']);
+Route::post('/heatpoints/delete/{id}', [\App\Http\Controllers\MapController::class,'deleteCoordinate']);
+Route::post('/heatpoints/update/{id}', [\App\Http\Controllers\MapController::class,'updateCoordinate']);
+Route::get('/heatpoints', [\App\Http\Controllers\MapController::class,'getCoordinatesWithinBoundingBox']);
+Route::get('/ways', [\App\Http\Controllers\MapController::class,'getWaysWithinBoundingBox']);
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

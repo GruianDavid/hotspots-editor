@@ -1,6 +1,9 @@
 import {Utils} from "./Utils";
 
 export class Events{
+    static changedStyle = "invert(100%)"
+    static changedFocusedStyle = Events.changedStyle + " drop-shadow(1px 1px 0 yellow) drop-shadow(-1px 1px 0 yellow)"
+    static ghostMarker = null
     static activeMarker = null
     static activeLayer = null
     static mapEvents(map){
@@ -14,10 +17,15 @@ export class Events{
             layerGroup.addLayer(marker);
             map.addLayer(layerGroup);
             Events.setMarkerEvents(marker, layerGroup);
-            marker._icon.style.filter = "invert(100%)";
+            marker._icon.style.filter = Events.changedStyle;
             Events.activeMarker = marker;
             Events.activeLayer = layerGroup;
+            Utils.displayMarkerData(marker);
             Events.sidebarToggle(true);
+            Utils.storeMarker(map, marker)
+        });
+        map.on('zoomend dragend', () => {
+            console.log(map.getZoom())
         });
     }
 
@@ -30,31 +38,54 @@ export class Events{
                 opacity: 0.5
             });
             layerGroup.addLayer(ghost);
+            if (Events.activeMarker !== null){
+                Events.activeMarker._icon.style.filter = Events.changedStyle
+            }
+            Events.ghostMarker = ghost
             Events.activeMarker = marker
             Events.activeLayer = layerGroup
         });
         marker.on('dragend', e => {
-            Utils.setLayerGroupStyleFilter(layerGroup,"invert(100%)")
+            Utils.setLayerGroupStyleFilter(layerGroup,Events.changedStyle)
+            Utils.displayMarkerData(marker,Events.ghostMarker);
             Events.sidebarToggle(true)
+            Events.activeMarker._icon.style.filter = Events.changedFocusedStyle
         });
         marker.on('click', e => {
-            if (Object.values(Events.activeLayer?._layers || {}).length >= 2){ return }
+            if (Object.values(Events.activeLayer?._layers || {}).length >= 2){
+                if (Object.values(layerGroup._layers).length >= 2){
+                    Events.activeMarker._icon.style.filter = Events.changedStyle
+                    Events.activeMarker = marker
+                    Events.activeMarker._icon.style.filter = Events.changedFocusedStyle
+                    Events.activeLayer = layerGroup
+                    Events.sidebarToggle(true)
+                }
+                return
+            }
             if (Events.activeMarker !== null){
                 Events.activeMarker._icon.style.filter = ""
             }
-            marker._icon.style.filter = "invert(100%)"
+            marker._icon.style.filter = Events.changedFocusedStyle
             Events.activeMarker = marker
             Events.activeLayer = layerGroup
+            Utils.displayMarkerData(marker);
             Events.sidebarToggle(true)
         })
         marker.on('confirm-layers', e =>{
-            layerGroup.clearLayers();
-            layerGroup.addLayer(marker)
-            ghost = null;
+            Utils.updateMarker(marker).then(()=>{
+                marker._icon.style.filter = ""
+                layerGroup.clearLayers();
+                layerGroup.addLayer(marker)
+                ghost = null;
+                Utils.toggleLoader(false)
+            })
         })
         marker.on('remove-layers', e =>{
-            layerGroup.clearLayers();
-            ghost = null;
+            Utils.deleteMarker(marker).then(()=>{
+                layerGroup.clearLayers();
+                ghost = null;
+                Utils.toggleLoader(false)
+            })
         })
         marker.on('reset-layers', e =>{
             layerGroup.clearLayers();
@@ -66,14 +97,12 @@ export class Events{
         })
     }
 
-    static sidebarEvents(map){
-
+    static sidebarEvents(){
         document.getElementById('markerReset').addEventListener("click",()=>{
             Events.activeMarker.fire('reset-layers')
             Events.sidebarToggle(false)
         })
         document.getElementById('markerConfirm').addEventListener("click",()=>{
-            Events.activeMarker._icon.style.filter = ""
             Events.activeMarker.fire('confirm-layers')
             Events.sidebarToggle(false)
         })
@@ -83,10 +112,10 @@ export class Events{
         })
     }
 
-    static sidebarToggle(state){
+    static sidebarToggle(shouldOpen){
         if (Events.activeMarker === null){return}
         const sidebar = document.getElementById('sidebar');
-        if (state){
+        if (shouldOpen){
             sidebar.classList.add('opened');
             return
         }
