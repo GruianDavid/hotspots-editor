@@ -6,6 +6,7 @@ export class Events{
     static ghostMarker = null
     static activeMarker = null
     static activeLayer = null
+    static alreadyLoadedMapBounds = [L.point([0, 0])];
     static mapEvents(map){
         map.on('dblclick', (e) => {
             if (Events.activeMarker !== null){return}
@@ -25,7 +26,21 @@ export class Events{
             Utils.storeMarker(map, marker)
         });
         map.on('zoomend dragend', () => {
-            console.log(map.getZoom())
+            Utils.setGetParamsForMap(map);
+            if (map.getZoom() >= 10){
+                let shouldUpdateMap = true;
+                for (let i = 0; i < this.alreadyLoadedMapBounds.length; i += 1) {
+                    if (this.alreadyLoadedMapBounds[i].contains(map.getBounds())) {
+                        shouldUpdateMap = false;
+                        break;
+                    }
+                }
+                if (shouldUpdateMap) {
+                    Utils.getWays(map,Utils.getPolygonFromBounds(map.getBounds()))
+                    this.alreadyLoadedMapBounds.push(map.getBounds());
+                }
+            }
+
         });
     }
 
@@ -38,6 +53,7 @@ export class Events{
                 opacity: 0.5
             });
             layerGroup.addLayer(ghost);
+            ghost._icon.style.filter = marker._icon.style.filter
             if (Events.activeMarker !== null){
                 Events.activeMarker._icon.style.filter = Events.changedStyle
             }
@@ -58,6 +74,7 @@ export class Events{
                     Events.activeMarker = marker
                     Events.activeMarker._icon.style.filter = Events.changedFocusedStyle
                     Events.activeLayer = layerGroup
+                    Utils.displayMarkerData(marker);
                     Events.sidebarToggle(true)
                 }
                 return

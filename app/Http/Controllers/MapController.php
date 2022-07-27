@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Coordinate;
 use App\Models\Way;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MapController extends Controller
 {
@@ -22,12 +24,24 @@ class MapController extends Controller
     /**
      * Return ways within a bbox
      */
-    public function getWaysWithinBoundingBox(Request $request): \Illuminate\Database\Eloquent\Collection|array
+    public function getWaysWithinBoundingBox(Request $request): StreamedResponse
     {
-        return Way::query()
-            ->selectRaw("ST_AsGeoJson(ST_FlipCoordinates(geom::geometry))::json->'coordinates' as coordinates")
+//        return Way::query()
+//            ->selectRaw("ST_AsGeoJson(ST_FlipCoordinates(geom::geometry))::json->'coordinates' as coordinates")
 //            ->whereRaw('ST_Intersects(ST_GeomFromGeoJson(?),geom::geometry)',[$request->bbox])
-            ->get();
+//            ->get();
+        //ST_LineMerge
+        $simplify = 0;
+//        if ($request->zoom <= 12){
+//            $simplify = 0;
+//        }
+        return new StreamedResponse(function() use ($request, $simplify) {
+            DB::table('ways')
+                ->selectRaw("ST_AsGeoJson(ST_FlipCoordinates(ST_SimplifyPreserveTopology(geom::geometry,?)))::json->'coordinates' as coordinates",[$simplify])
+                ->whereRaw('ST_Intersects(ST_GeomFromGeoJson(?),geom::geometry)',[$request->bbox])
+                ->orderBy('id')
+                ->chunk("500", function($e){ echo $e;});
+        });
     }
 
     public function createCoordinate(Request $request): bool|string
