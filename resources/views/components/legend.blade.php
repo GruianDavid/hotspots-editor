@@ -3,7 +3,15 @@
     <div class="map-legend-body">
         <div class="map-legend-list" id="mapLegendList">
             <li class="map-legend-list-item">
-                <span class="item-name">Erase lines</span>
+                <span class="item-name">
+                    <span>Display ways</span>
+                </span>
+                <span class="item-name">
+                    <div class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </div>
+                </span>
             </li>
             <li class="map-legend-list-item">
                 <span class="item-name">Load lines in view (zoom level)</span>

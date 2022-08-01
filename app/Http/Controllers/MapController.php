@@ -26,18 +26,9 @@ class MapController extends Controller
      */
     public function getWaysWithinBoundingBox(Request $request): StreamedResponse
     {
-//        return Way::query()
-//            ->selectRaw("ST_AsGeoJson(ST_FlipCoordinates(geom::geometry))::json->'coordinates' as coordinates")
-//            ->whereRaw('ST_Intersects(ST_GeomFromGeoJson(?),geom::geometry)',[$request->bbox])
-//            ->get();
-        //ST_LineMerge
-        $simplify = 0;
-//        if ($request->zoom <= 12){
-//            $simplify = 0;
-//        }
-        return new StreamedResponse(function() use ($request, $simplify) {
+        return new StreamedResponse(function() use ($request) {
             DB::table('ways')
-                ->selectRaw("ST_AsGeoJson(ST_FlipCoordinates(ST_SimplifyPreserveTopology(geom::geometry,?)))::json->'coordinates' as coordinates",[$simplify])
+                ->selectRaw("ST_AsGeoJson(ST_FlipCoordinates(geom::geometry))::json->'coordinates' as coordinates")
                 ->whereRaw('ST_Intersects(ST_GeomFromGeoJson(?),geom::geometry)',[$request->bbox])
                 ->orderBy('id')
                 ->chunk("500", function($e){ echo $e;});
